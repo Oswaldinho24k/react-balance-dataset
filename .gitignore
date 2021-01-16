@@ -4,6 +4,7 @@
 /build
 .firebaserc
 .firebase.json
+.firebase/
 
 # environment variables file
 .env
