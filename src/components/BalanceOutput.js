@@ -1,7 +1,14 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import * as utils from '../utils';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import {
+  dateToString,
+  toCSV,
+  setEntriesLabelandBalance,
+  findByAccount,
+  findByPeriod,
+  getTotal,
+} from "../utils";
 
 class BalanceOutput extends Component {
   render() {
@@ -10,22 +17,20 @@ class BalanceOutput extends Component {
     }
 
     return (
-      <div className='output'>
+      <div className="output">
         <p>
-          Total Debit: {this.props.totalDebit} Total Credit: {this.props.totalCredit}
+          Total Debit: {this.props.totalDebit} Total Credit:{" "}
+          {this.props.totalCredit}
           <br />
-          Balance from account {this.props.userInput.startAccount || '*'}
-          {' '}
-          to {this.props.userInput.endAccount || '*'}
-          {' '}
-          from period {utils.dateToString(this.props.userInput.startPeriod)}
-          {' '}
-          to {utils.dateToString(this.props.userInput.endPeriod)}
+          Balance from account {this.props.userInput.startAccount ||
+            "*"} to {this.props.userInput.endAccount || "*"} from period{" "}
+          {dateToString(this.props.userInput.startPeriod)} to{" "}
+          {dateToString(this.props.userInput.endPeriod)}
         </p>
-        {this.props.userInput.format === 'CSV' ? (
-          <pre>{utils.toCSV(this.props.balance)}</pre>
+        {this.props.userInput.format === "CSV" ? (
+          <pre>{toCSV(this.props.balance)}</pre>
         ) : null}
-        {this.props.userInput.format === 'HTML' ? (
+        {this.props.userInput.format === "HTML" ? (
           <table className="table">
             <thead>
               <tr>
@@ -34,6 +39,7 @@ class BalanceOutput extends Component {
                 <th>DEBIT</th>
                 <th>CREDIT</th>
                 <th>BALANCE</th>
+                <th>PERIOD</th>
               </tr>
             </thead>
             <tbody>
@@ -44,6 +50,7 @@ class BalanceOutput extends Component {
                   <td>{entry.DEBIT}</td>
                   <td>{entry.CREDIT}</td>
                   <td>{entry.BALANCE}</td>
+                  <td>{dateToString(entry.PERIOD)}</td>
                 </tr>
               ))}
             </tbody>
@@ -61,7 +68,7 @@ BalanceOutput.propTypes = {
       DESCRIPTION: PropTypes.string.isRequired,
       DEBIT: PropTypes.number.isRequired,
       CREDIT: PropTypes.number.isRequired,
-      BALANCE: PropTypes.number.isRequired
+      BALANCE: PropTypes.number.isRequired,
     })
   ).isRequired,
   totalCredit: PropTypes.number.isRequired,
@@ -71,22 +78,40 @@ BalanceOutput.propTypes = {
     endAccount: PropTypes.number,
     startPeriod: PropTypes.date,
     endPeriod: PropTypes.date,
-    format: PropTypes.string
-  }).isRequired
+    format: PropTypes.string,
+  }).isRequired,
 };
 
-export default connect(state => {
-  let balance = [];
+export default connect(({ userInput, journalEntries, accounts }) => {
+  const {
+    endAccount,
+    endPeriod,
+    format,
+    startAccount,
+    startPeriod,
+  } = userInput;
 
-  /* YOUR CODE GOES HERE */
+  const allEntries = setEntriesLabelandBalance({ accounts, journalEntries });
+  const entriesByAccount = findByAccount({
+    entries: allEntries,
+    startAccount,
+    endAccount,
+  });
 
-  const totalCredit = balance.reduce((acc, entry) => acc + entry.CREDIT, 0);
-  const totalDebit = balance.reduce((acc, entry) => acc + entry.DEBIT, 0);
+  const entriesByPeriod = findByPeriod({
+    entries: entriesByAccount,
+    startPeriod,
+    endPeriod,
+  });
+
+  const totalCredit = getTotal({ entries: entriesByPeriod, key: "CREDIT" });
+
+  const totalDebit = getTotal({ entries: entriesByPeriod, key: "DEBIT" });
 
   return {
-    balance,
+    balance: entriesByPeriod,
     totalCredit,
     totalDebit,
-    userInput: state.userInput
+    userInput: userInput,
   };
 })(BalanceOutput);

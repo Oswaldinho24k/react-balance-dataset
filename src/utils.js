@@ -1,58 +1,94 @@
-export const stringToDate = str => {
-  if (str === '*') {
+export const stringToDate = (str) => {
+  if (str === "*") {
     return new Date(str);
   }
 
-  const [month, year] = str.split('-');
+  const [month, year] = str.split("-");
   return new Date(`${month} 1 20${year}`);
-}
+};
 
-export const dateToString = d => {
+export const dateToString = (d) => {
   if (isNaN(d.valueOf())) {
-    return '*';
+    return "*";
   }
 
-  const [_, month, __, year] = d.toString().split(' ');
-  return `${month.toUpperCase()}-${year.slice(2, 4)}`
-}
+  const [_, month, __, year] = d.toString().split(" ");
+  return `${month.toUpperCase()}-${year.slice(2, 4)}`;
+};
 
-export const parseCSV = str => {
-  let [headers, ...lines] = str.split(';\n');
+export const parseCSV = (str) => {
+  let [headers, ...lines] = str.split(";\n");
 
-  headers = headers.split(';');
+  headers = headers.split(";");
 
-  return lines.map(line => {
-    return line
-      .split(';')
-      .reduce((acc, value, i) => {
-        if (['ACCOUNT', 'DEBIT', 'CREDIT'].includes(headers[i])) {
-          acc[headers[i]] = parseInt(value, 10);
-        } else if (headers[i] === 'PERIOD') {
-          acc[headers[i]] = stringToDate(value);
-        } else {
-          acc[headers[i]] = value;
-        }
-        return acc;
-      }, {});
+  return lines.map((line) => {
+    return line.split(";").reduce((acc, value, i) => {
+      if (["ACCOUNT", "DEBIT", "CREDIT"].includes(headers[i])) {
+        acc[headers[i]] = parseInt(value, 10);
+      } else if (headers[i] === "PERIOD") {
+        acc[headers[i]] = stringToDate(value);
+      } else {
+        acc[headers[i]] = value;
+      }
+      return acc;
+    }, {});
   });
-}
+};
 
-export const toCSV = arr => {
-  let headers = Object.keys(arr[0]).join(';');
-  let lines = arr.map(obj => Object.values(obj).join(';'));
-  return [headers, ...lines].join(';\n');
-}
+export const toCSV = (arr) => {
+  let headers = Object.keys(arr[0]).join(";");
+  let lines = arr.map((obj) => Object.values(obj).join(";"));
+  return [headers, ...lines].join(";\n");
+};
 
-export const parseUserInput = str => {
-  const [
-    startAccount, endAccount, startPeriod, endPeriod, format
-  ] = str.split(' ');
+export const parseUserInput = (str) => {
+  const [startAccount, endAccount, startPeriod, endPeriod, format] = str.split(
+    " "
+  );
 
   return {
     startAccount: parseInt(startAccount, 10),
     endAccount: parseInt(endAccount, 10),
     startPeriod: stringToDate(startPeriod),
     endPeriod: stringToDate(endPeriod),
-    format
+    format,
   };
-}
+};
+
+export const setEntriesLabelandBalance = ({ journalEntries, accounts }) => {
+  return journalEntries.map((entry) => {
+    const correspondingAccount = accounts.find(
+      (acc) => acc.ACCOUNT === entry.ACCOUNT
+    );
+    const DESCRIPTION =
+      (correspondingAccount && correspondingAccount.LABEL) || "---";
+    const BALANCE = entry.DEBIT - entry.CREDIT;
+    return {
+      ...entry,
+      DESCRIPTION,
+      BALANCE,
+    };
+  });
+};
+
+export const findByAccount = ({ entries, startAccount, endAccount }) => {
+  const start = isNaN(startAccount) ? 0 : startAccount;
+  const end = isNaN(endAccount) ? Number.MAX_SAFE_INTEGER : endAccount;
+
+  return entries.filter(
+    (entry) => entry.ACCOUNT >= start && entry.ACCOUNT <= end
+  );
+};
+
+export const findByPeriod = ({ entries, startPeriod, endPeriod }) => {
+  const start = isNaN(Date.parse(startPeriod)) ? new Date(0) : startPeriod;
+  const end = isNaN(Date.parse(endPeriod)) ? new Date() : endPeriod;
+
+  return entries.filter(
+    (entry) => entry.PERIOD >= start && entry.PERIOD <= end
+  );
+};
+
+export const getTotal = ({ entries, key }) => {
+  return entries.reduce((acc, entry) => acc + entry[key], 0);
+};
