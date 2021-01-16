@@ -1,11 +1,11 @@
-import * as actions from '../actions';
+import * as actions from "../actions";
 
 const initialState = {
   startAccount: undefined,
   endAccount: undefined,
   startPeriod: undefined,
   endPeriod: undefined,
-  format: undefined
+  format: undefined,
 };
 
 export default function userInput(state = initialState, action) {
@@ -17,3 +17,6 @@ export default function userInput(state = initialState, action) {
       return state;
   }
 }
+
+//selector
+export const getUserInput = (state) => state.userInput;

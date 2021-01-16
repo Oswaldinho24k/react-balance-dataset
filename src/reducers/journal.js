@@ -1,4 +1,4 @@
-import * as actions from '../actions';
+import * as actions from "../actions";
 
 const initialState = [];
 
@@ -11,3 +11,5 @@ export default function journal(state = initialState, action) {
       return state;
   }
 }
+
+export const getJournalEntries = (state) => state.journalEntries;
