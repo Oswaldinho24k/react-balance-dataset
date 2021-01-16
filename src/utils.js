@@ -61,21 +61,23 @@ export const parseUserInput = (str) => {
  * @param {array} params.journalEntries - array of Journal Entries
  * @param {array} params.accounts - array of accounts
  *
- * setEntriesLabelandBalance is a function that returns a new array with the correct format used by the OutputTable adding labels and balance
+ * setEntriesLabelandBalance is a function that returns a new array with the correct format used by the OutputTable adding labels, balance and formatted Date
  */
 
-export const setEntriesLabelandBalance = ({ journalEntries, accounts }) => {
-  return journalEntries.map((entry) => {
+export const setEntriesLabelandBalance = ({ entries, accounts }) => {
+  return entries.map((entry) => {
     const correspondingAccount = accounts.find(
       (acc) => acc.ACCOUNT === entry.ACCOUNT
     );
     const DESCRIPTION =
       (correspondingAccount && correspondingAccount.LABEL) || "---";
     const BALANCE = entry.DEBIT - entry.CREDIT;
+    const PERIOD = dateToString(entry.PERIOD);
     return {
       ...entry,
       DESCRIPTION,
       BALANCE,
+      PERIOD,
     };
   });
 };

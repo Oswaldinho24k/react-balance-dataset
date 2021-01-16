@@ -27,11 +27,9 @@ function BalanceOutput() {
     startPeriod,
   } = userInput;
 
-  //formatting all entries
-  const allEntries = setEntriesLabelandBalance({ accounts, journalEntries });
   //filtering entries by account
   const entriesByAccount = findByAccount({
-    entries: allEntries,
+    entries: journalEntries,
     startAccount,
     endAccount,
   });
@@ -41,9 +39,14 @@ function BalanceOutput() {
     startPeriod,
     endPeriod,
   });
+  //formatting all entries
+  const formattedEntries = setEntriesLabelandBalance({
+    accounts,
+    entries: entriesByPeriod,
+  });
   //getting totals
-  const totalCredit = getTotal({ entries: entriesByPeriod, key: "CREDIT" });
-  const totalDebit = getTotal({ entries: entriesByPeriod, key: "DEBIT" });
+  const totalCredit = getTotal({ entries: formattedEntries, key: "CREDIT" });
+  const totalDebit = getTotal({ entries: formattedEntries, key: "DEBIT" });
 
   if (!format) return null;
 
@@ -55,9 +58,9 @@ function BalanceOutput() {
         Balance from account {startAccount || "*"} to {endAccount || "*"} from
         period {dateToString(startPeriod)} to {dateToString(endPeriod)}
       </p>
-      {format === "CSV" ? <pre>{toCSV(entriesByPeriod)}</pre> : null}
+      {format === "CSV" ? <pre>{toCSV(formattedEntries)}</pre> : null}
       {format === "HTML" ? (
-        <BalanceOutputTable balance={entriesByPeriod} />
+        <BalanceOutputTable balance={formattedEntries} />
       ) : null}
     </div>
   );

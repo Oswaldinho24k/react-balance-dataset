@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { dateToString } from "../utils";
 
 function BalanceOutputTable({ balance }) {
   const renderRows = () => {
@@ -11,7 +10,7 @@ function BalanceOutputTable({ balance }) {
         <td>{entry.DEBIT}</td>
         <td>{entry.CREDIT}</td>
         <td>{entry.BALANCE}</td>
-        <td>{dateToString(entry.PERIOD)}</td>
+        <td>{entry.PERIOD}</td>
       </tr>
     ));
   };
