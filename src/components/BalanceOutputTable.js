@@ -3,6 +3,18 @@ import PropTypes from "prop-types";
 import { dateToString } from "../utils";
 
 function BalanceOutputTable({ balance }) {
+  const renderRows = () => {
+    return balance.map((entry, i) => (
+      <tr key={i}>
+        <th scope="row">{entry.ACCOUNT}</th>
+        <td>{entry.DESCRIPTION}</td>
+        <td>{entry.DEBIT}</td>
+        <td>{entry.CREDIT}</td>
+        <td>{entry.BALANCE}</td>
+        <td>{dateToString(entry.PERIOD)}</td>
+      </tr>
+    ));
+  };
   return (
     <table className="table">
       <thead>
@@ -15,18 +27,7 @@ function BalanceOutputTable({ balance }) {
           <th>PERIOD</th>
         </tr>
       </thead>
-      <tbody>
-        {balance.map((entry, i) => (
-          <tr key={i}>
-            <th scope="row">{entry.ACCOUNT}</th>
-            <td>{entry.DESCRIPTION}</td>
-            <td>{entry.DEBIT}</td>
-            <td>{entry.CREDIT}</td>
-            <td>{entry.BALANCE}</td>
-            <td>{dateToString(entry.PERIOD)}</td>
-          </tr>
-        ))}
-      </tbody>
+      <tbody>{renderRows()}</tbody>
     </table>
   );
 }

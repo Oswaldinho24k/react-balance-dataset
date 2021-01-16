@@ -55,6 +55,15 @@ export const parseUserInput = (str) => {
   };
 };
 
+/**
+ *
+ * @param {object} params - params
+ * @param {array} params.journalEntries - array of Journal Entries
+ * @param {array} params.accounts - array of accounts
+ *
+ * setEntriesLabelandBalance is a function that returns a new array with the correct format used by the OutputTable adding labels and balance
+ */
+
 export const setEntriesLabelandBalance = ({ journalEntries, accounts }) => {
   return journalEntries.map((entry) => {
     const correspondingAccount = accounts.find(
@@ -71,6 +80,15 @@ export const setEntriesLabelandBalance = ({ journalEntries, accounts }) => {
   });
 };
 
+/**
+ *
+ * @param {object} params - params
+ * @param {array} params.entries - array of Journal Entries
+ * @param {number} params.startAccount - first account of source
+ * @param {number} params.endAccount - last account of source
+ *
+ * FindByAccount is a function that returns a filtered array based on account params you recive from input,
+ */
 export const findByAccount = ({ entries, startAccount, endAccount }) => {
   const start = isNaN(startAccount) ? 0 : startAccount;
   const end = isNaN(endAccount) ? Number.MAX_SAFE_INTEGER : endAccount;
@@ -80,6 +98,15 @@ export const findByAccount = ({ entries, startAccount, endAccount }) => {
   );
 };
 
+/**
+ *
+ * @param {object} params - params
+ * @param {array} params.entries - array of Journal Entries
+ * @param {date} params.startPeriod - first account of source
+ * @param {date} params.endPeriod - last account of source
+ *
+ * FindByPeriod is a function that returns a filtered array based on period params you recive from input,
+ */
 export const findByPeriod = ({ entries, startPeriod, endPeriod }) => {
   const start = isNaN(Date.parse(startPeriod)) ? new Date(0) : startPeriod;
   const end = isNaN(Date.parse(endPeriod)) ? new Date() : endPeriod;
@@ -89,6 +116,14 @@ export const findByPeriod = ({ entries, startPeriod, endPeriod }) => {
   );
 };
 
+/**
+ *
+ * @param {object} params - params
+ * @param {array} params.entries - array of Journal Entries
+ * @param {string} params.key - object key
+ *
+ * getTotal is a function that returns the sum of the given key from an array of objects
+ */
 export const getTotal = ({ entries, key }) => {
   return entries.reduce((acc, entry) => acc + entry[key], 0);
 };

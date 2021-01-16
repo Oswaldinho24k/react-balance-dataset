@@ -15,6 +15,7 @@ import { getJournalEntries } from "../reducers/journal";
 import BalanceOutputTable from "./BalanceOutputTable";
 
 function BalanceOutput() {
+  //redux data
   const userInput = useSelector(getUserInput);
   const accounts = useSelector(getAccounts);
   const journalEntries = useSelector(getJournalEntries);
@@ -26,24 +27,23 @@ function BalanceOutput() {
     startPeriod,
   } = userInput;
 
+  //formatting all entries
   const allEntries = setEntriesLabelandBalance({ accounts, journalEntries });
+  //filtering entries by account
   const entriesByAccount = findByAccount({
     entries: allEntries,
     startAccount,
     endAccount,
   });
-
+  //filtering entries by period
   const entriesByPeriod = findByPeriod({
     entries: entriesByAccount,
     startPeriod,
     endPeriod,
   });
-
+  //getting totals
   const totalCredit = getTotal({ entries: entriesByPeriod, key: "CREDIT" });
-
   const totalDebit = getTotal({ entries: entriesByPeriod, key: "DEBIT" });
-
-  const balance = entriesByPeriod;
 
   if (!format) return null;
 
@@ -55,8 +55,10 @@ function BalanceOutput() {
         Balance from account {startAccount || "*"} to {endAccount || "*"} from
         period {dateToString(startPeriod)} to {dateToString(endPeriod)}
       </p>
-      {format === "CSV" ? <pre>{toCSV(balance)}</pre> : null}
-      {format === "HTML" ? <BalanceOutputTable balance={balance} /> : null}
+      {format === "CSV" ? <pre>{toCSV(entriesByPeriod)}</pre> : null}
+      {format === "HTML" ? (
+        <BalanceOutputTable balance={entriesByPeriod} />
+      ) : null}
     </div>
   );
 }
